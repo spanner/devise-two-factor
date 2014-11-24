@@ -3,6 +3,14 @@ require 'devise_two_factor/models'
 require 'devise_two_factor/strategies'
 
 module Devise
+  class OtpError < StandardError
+    attr_accessor :resource
+    def initialize(message = nil, resource = nil)
+      super(message)
+      self.resource = resource
+    end
+  end
+  
   # The length of generated OTP secrets
   mattr_accessor :otp_secret_length
   @@otp_secret_length = 128

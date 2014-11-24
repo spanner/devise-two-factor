@@ -12,7 +12,7 @@ module Devise
         attr_encrypted :otp_secret, :key  => self.otp_secret_encryption_key,
                                     :mode => :per_attribute_iv_and_salt unless self.attr_encrypted?(:otp_secret)
 
-        attr_accessor :otp_attempt
+        attr_accessor :otp_attempt, :otp_required
       end
 
       def self.required_fields(klass)
@@ -35,6 +35,10 @@ module Devise
 
       def current_otp
         otp.at(Time.now)
+      end
+      
+      def otp_required?
+        !!otp_required
       end
 
       def otp_provisioning_uri(account, options = {})
