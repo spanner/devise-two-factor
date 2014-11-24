@@ -8,9 +8,19 @@ module Devise
         # 1. The password and the OTP are correct
         # 2. The password is correct, and OTP is not required for login
         # We check the OTP, then defer to DatabaseAuthenticatable
+        
+        otp_secret = params[scope]['otp_secret']
+        otp_attempt = params[scope]['otp_attempt']
         if validate(resource) { !resource.otp_required_for_login || 
-                                resource.valid_otp?(params[scope]['otp_attempt']) }
+                                (!resource.mfa_set? && resource.valid_otp?(otp_attempt, otp_secret: otp_secret)) || 
+                                resource.valid_otp?(otp_attempt) }
+          if otp_secret.present? && !resource.mfa_set?
+            resource.otp_secret = otp_secret
+            resource save
+          end
+
           super
+
         else
           raise Devise::OtpError.new("One-time password required", resource)
         end
