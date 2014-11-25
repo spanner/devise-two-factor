@@ -16,7 +16,7 @@ module Devise
                                 resource.valid_otp?(otp_attempt) }
           if otp_secret.present? && !resource.mfa_set?
             resource.otp_secret = otp_secret
-            resource save
+            resource.save
           end
 
           super
