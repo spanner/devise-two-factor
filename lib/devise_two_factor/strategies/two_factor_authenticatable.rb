@@ -24,10 +24,13 @@ module Devise
 
       def validate_otp(resource)
         return true unless resource.otp_required_for_login
-        otp_secret = params[scope]['otp_secret']
-        otp_attempt = params[scope]['otp_attempt']
-        return if otp_attempt.nil?
-		(!resource.mfa_set? && resource.valid_otp?(otp_attempt, otp_secret: otp_secret)) || resource.valid_otp?(otp_attempt)
+        return false if params[scope]['otp_attempt'].nil?
+        if !resource.mfa_set? && resource.valid_otp?(params[scope]['otp_attempt'], otp_secret: params[scope]['otp_secret'])
+          resource.otp_secret = params[scope]['otp_secret']
+          resource.save
+          return true
+        end
+        resource.valid_otp?(params[scope]['otp_attempt'])
       end
     end
   end
