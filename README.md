@@ -11,17 +11,22 @@ Devise-two-factor is a minimalist extension to Devise which offers support for t
 * Is extensible, and includes two-factor backup codes as an example of how plugins can be structured
 
 ## Example App
-An example Rails 4 application is provided in demo/
+An example Rails 4 application is provided in demo/. It showcases a minimal example of devise-two-factor in action, and can act as a reference for integrating the gem into your own application.
 
-It showcases a minimal example of devise-two-factor in action, and can act as a reference for integrating the gem into your own application.
-
+For the demo app to work, create an encryption key and store it as an environment variable. One way to do this is to create a file named `local_env.yml` in the application root. Set the value of 'ENCRYPTION_KEY' in the YML file. That value will be loaded into the application environment by `application.rb`.
 
 ## Getting Started
 Devise-two-factor doesn't require much to get started, but there are a few prerequisites before you can start using it in your application.
 
 First, you'll need a Rails application setup with Devise. Visit the Devise [homepage](https://github.com/plataformatec/devise) for instructions.
 
-Next, since devise-two-factor encrypts its secrets before storing them in the database, you'll need to generate an encryption key, and store it in an environment variable of your choice.
+Next, since devise-two-factor encrypts its secrets before storing them in the database, you'll need to generate an encryption key, and store it in an environment variable of your choice. Set the encryption key in the model that uses devise:
+
+```
+  devise :two_factor_authenticatable,
+         :otp_secret_encryption_key => ENV['YOUR_ENCRYPTION_KEY_HERE']
+
+```
 
 Finally, you can automate all of the required setup by simply running:
 
@@ -41,6 +46,20 @@ This generator will add a few columns to the specified model:
 It also adds the :two_factor_authenticatable directive to your model, and sets up your encryption key. If present, it will remove :database_authenticatable from the model, as the two strategies are incompatible. Lastly, the generator will add a Warden config block to your Devise initializer, which enables the strategies required for two-factor authenticatation.
 
 If you're running Rails 3, or do not have strong parameters enabled, the generator will also setup the required mass-assignment security options in your model.
+
+If you're running Rails 4, you'll also need to whitelist `:otp_attempt` as a permitted parameter in Devise `:sign_in` controller. You can do this by adding the following to your `application_controller.rb`
+
+```ruby
+before_action :configure_permitted_parameters, if: :devise_controller?
+
+...
+
+protected
+
+def configure_permitted_parameters
+  devise_parameter_sanitizer.for(:sign_in) << :otp_attempt
+end
+```
 
 **After running the generator, verify that :database_authenticatable is not being loaded by your model. The generator will try to remove it, but if you have a non-standard Devise setup, this step may fail. Loading both :database_authenticatable and :two_factor_authenticatable in a model will allow users to bypass two-factor authenticatable due to the way Warden handles cascading strategies.**
 
@@ -63,6 +82,11 @@ Logging in with two-factor authentication works extremely similarly to regular d
 3. otp_attempt (Their one-time password for this session)
 
 These parameters can be submitted to the standard Devise login route, and the strategy will handle the authentication of the user for you.
+
+### Disabling Automatic Login After Password Resets
+If you use the Devise ```recoverable``` strategy, the default behavior after a password reset is to automatically authenticate the user and log them in. This is obviously a problem if a user has two-factor authentication enabled, as resetting the password would get around the 2FA requirement.
+
+Because of this, you need to set `sign_in_after_reset_password` to false (either globally in your Devise initializer or via `devise_for`)
 
 ### Enabling Two-Factor Authentication
 Enabling two-factor authentication for a user is easy. For example, if my user model were named User, I could do the following:
