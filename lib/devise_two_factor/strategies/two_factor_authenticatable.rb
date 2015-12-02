@@ -25,7 +25,7 @@ module Devise
       def validate_otp(resource)
         return true unless resource.otp_required_for_login
         return if params[scope]['otp_attempt'].nil?
-        if !resource.mfa_set? && resource.validate_and_consume_otp?(params[scope]['otp_attempt'], otp_secret: params[scope]['otp_secret'])
+        if !resource.mfa_set? && resource.validate_and_consume_otp!(params[scope]['otp_attempt'], otp_secret: params[scope]['otp_secret'])
           resource.otp_secret = params[scope]['otp_secret']
           resource.save
           return true
