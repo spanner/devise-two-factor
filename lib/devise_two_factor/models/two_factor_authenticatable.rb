@@ -8,8 +8,15 @@ module Devise
       include Devise::Models::DatabaseAuthenticatable
 
       included do
-        attr_encrypted :otp_secret, :key  => self.otp_secret_encryption_key,
-                                    :mode => :per_attribute_iv_and_salt unless self.attr_encrypted?(:otp_secret)
+        unless singleton_class.ancestors.include?(AttrEncrypted)
+          extend AttrEncrypted
+        end
+
+        unless attr_encrypted?(:otp_secret)
+          attr_encrypted :otp_secret,
+            :key  => self.otp_secret_encryption_key,
+            :mode => :per_attribute_iv_and_salt unless self.attr_encrypted?(:otp_secret)
+        end
 
         attr_accessor :otp_attempt, :otp_required
       end
@@ -22,7 +29,7 @@ module Devise
       # If this hasn't been generated yet, pass a secret as an option
       def validate_and_consume_otp!(code, options = {})
         otp_secret = options[:otp_secret] || self.otp_secret
-        return false unless otp_secret.present?
+        return false unless code.present? && otp_secret.present?
 
         totp = self.otp(otp_secret)
         return consume_otp! if totp.verify_with_drift(code, self.class.otp_allowed_drift)

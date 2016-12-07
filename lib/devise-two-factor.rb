@@ -13,12 +13,12 @@ module Devise
   
   # The length of generated OTP secrets
   mattr_accessor :otp_secret_length
-  @@otp_secret_length = 32
+  @@otp_secret_length = 24
 
   # The number of seconds before and after the current
   # time for which codes will be accepted
   mattr_accessor :otp_allowed_drift
-  @@otp_allowed_drift = 60
+  @@otp_allowed_drift = 30
 
   # The key used to encrypt OTP secrets in the database
   mattr_accessor :otp_secret_encryption_key
