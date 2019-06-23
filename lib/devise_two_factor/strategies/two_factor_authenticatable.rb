@@ -15,7 +15,7 @@ module Devise
           raise Devise::OtpError.new("One-time password required", resource)
         end
 
-        fail(:not_found_in_database) unless resource
+        fail(Devise.paranoid ? :invalid : :not_found_in_database) unless resource
 
         # We want to cascade to the next strategy if this one fails,
         # but database authenticatable automatically halts on a bad password

@@ -1,5 +1,5 @@
 # Devise-Two-Factor Authentication
-By [Tinfoil Security](http://tinfoilsecurity.com/)
+By [Tinfoil Security](https://www.tinfoilsecurity.com/). Interested in [working with us](https://www.tinfoilsecurity.com/jobs)? We're hiring!
 
 [![Build Status](https://travis-ci.org/tinfoil/devise-two-factor.svg?branch=master)](https://travis-ci.org/tinfoil/devise-two-factor)
 
@@ -7,8 +7,11 @@ Devise-Two-Factor is a minimalist extension to Devise which offers support for t
 
 * Allows you to incorporate two-factor authentication into your existing models
 * Is opinionated about security, so you don't have to be
-* Integrates easily with two-factor applications like Google Authenticator and Authy
+* Integrates easily with two-factor applications like [Google Authenticator](https://support.google.com/accounts/answer/1066447?hl=en) and [Authy](https://authy.com/)
 * Is extensible, and includes two-factor backup codes as an example of how plugins can be structured
+
+## Contributing
+We welcome pull requests, bug reports, and other contributions. We're especially looking for help getting this gem fully compatible with Rails 5+ and squashing any deprecation messages.
 
 ## Example App
 An example Rails 4 application is provided in the `demo` directory. It showcases a minimal example of Devise-Two-Factor in action, and can act as a reference for integrating the gem into your own application.
